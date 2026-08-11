@@ -22,4 +22,15 @@ public class TaskService {
 
         return task;
     }
+
+    public List<Task> getAllTasks() {
+        return taskList;
+    }
+
+    public Task getTask(Long id) {
+        return taskList.stream()
+                .filter(task -> id.equals(task.getId()))
+                .findFirst()
+                .orElse(null);
+    }
 }
