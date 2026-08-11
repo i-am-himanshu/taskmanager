@@ -1,5 +1,6 @@
 package com.himanshu.taskmanager.service;
 
+import com.himanshu.taskmanager.exception.TaskNotFoundException;
 import com.himanshu.taskmanager.model.Task;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,14 @@ public class TaskService {
         return taskList.stream()
                 .filter(task -> id.equals(task.getId()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new TaskNotFoundException("Task not found."));
+    }
+
+    public void deleteTask(Long id) {
+        boolean isDeleted = taskList.removeIf(task -> id.equals(task.getId()));
+
+        if(!isDeleted){
+            throw new TaskNotFoundException("Task not found.");
+        }
     }
 }
