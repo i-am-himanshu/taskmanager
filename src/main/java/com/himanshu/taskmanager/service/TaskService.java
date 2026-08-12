@@ -42,4 +42,18 @@ public class TaskService {
             throw new TaskNotFoundException("Task not found.");
         }
     }
+
+    public Task updateTask(Long id, Task task) {
+        Task foundTask = taskList.stream()
+                .filter(currentTask -> id.equals(currentTask.getId()))
+                .findFirst()
+                .orElseThrow(() -> new TaskNotFoundException("Task not found."));
+
+        foundTask.setTitle(task.getTitle());
+        foundTask.setDescription(task.getDescription());
+        foundTask.setStatus(task.getStatus());
+        foundTask.setPriority(task.getPriority());
+
+        return foundTask;
+    }
 }
