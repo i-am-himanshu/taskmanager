@@ -1,5 +1,7 @@
 package com.himanshu.taskmanager.service;
 
+import com.himanshu.taskmanager.dto.TaskRequest;
+import com.himanshu.taskmanager.dto.TaskResponse;
 import com.himanshu.taskmanager.exception.TaskNotFoundException;
 import com.himanshu.taskmanager.model.Task;
 import org.springframework.stereotype.Service;
@@ -14,25 +16,52 @@ public class TaskService {
 
     private Long nextId = 1L;
 
-    public Task createTask(Task task){
+
+
+    public TaskResponse createTask(TaskRequest taskRequest){
+
+        Task task = new Task();
+
+        task.setTitle(taskRequest.getTitle());
+        task.setStatus(taskRequest.getStatus());
+        task.setPriority(taskRequest.getPriority());
+        task.setDescription(taskRequest.getDescription());
 
         task.setId(nextId);
         taskList.add(task);
 
         nextId++;
 
-        return task;
+        return mapToTaskResponse(task);
     }
 
-    public List<Task> getAllTasks() {
-        return taskList;
+    private TaskResponse mapToTaskResponse(Task task) {
+        TaskResponse taskResponse = new TaskResponse();
+
+        taskResponse.setId(task.getId());
+        taskResponse.setTitle(task.getTitle());
+        taskResponse.setStatus(task.getStatus());
+        taskResponse.setPriority(task.getPriority());
+        taskResponse.setDescription(task.getDescription());
+
+        return taskResponse;
     }
 
-    public Task getTask(Long id) {
+    public List<TaskResponse> getAllTasks() {
+
         return taskList.stream()
+                .map(this::mapToTaskResponse)
+                .toList();
+
+    }
+
+    public TaskResponse getTask(Long id) {
+        Task foundTask = taskList.stream()
                 .filter(task -> id.equals(task.getId()))
                 .findFirst()
                 .orElseThrow(() -> new TaskNotFoundException("Task not found."));
+
+        return mapToTaskResponse(foundTask);
     }
 
     public void deleteTask(Long id) {
@@ -43,17 +72,17 @@ public class TaskService {
         }
     }
 
-    public Task updateTask(Long id, Task task) {
+    public TaskResponse updateTask(Long id, TaskRequest taskRequest) {
         Task foundTask = taskList.stream()
                 .filter(currentTask -> id.equals(currentTask.getId()))
                 .findFirst()
                 .orElseThrow(() -> new TaskNotFoundException("Task not found."));
 
-        foundTask.setTitle(task.getTitle());
-        foundTask.setDescription(task.getDescription());
-        foundTask.setStatus(task.getStatus());
-        foundTask.setPriority(task.getPriority());
+        foundTask.setTitle(taskRequest.getTitle());
+        foundTask.setDescription(taskRequest.getDescription());
+        foundTask.setStatus(taskRequest.getStatus());
+        foundTask.setPriority(taskRequest.getPriority());
 
-        return foundTask;
+        return mapToTaskResponse(foundTask);
     }
 }
