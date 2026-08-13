@@ -4,6 +4,7 @@ import com.himanshu.taskmanager.dto.TaskRequest;
 import com.himanshu.taskmanager.dto.TaskResponse;
 import com.himanshu.taskmanager.model.Task;
 import com.himanshu.taskmanager.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class TaskController {
     }
 
     @PostMapping("/tasks")
-    public TaskResponse createTask(@RequestBody TaskRequest taskRequest) {
+    public TaskResponse createTask(@Valid @RequestBody TaskRequest taskRequest) {
 
         return taskService.createTask(taskRequest);
 
@@ -40,7 +41,7 @@ public class TaskController {
     }
 
     @PutMapping("/tasks/{id}")
-    public TaskResponse updateTask(@PathVariable Long id, @RequestBody TaskRequest taskRequest) {
+    public TaskResponse updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequest taskRequest) {
         return taskService.updateTask(id, taskRequest);
     }
 }
