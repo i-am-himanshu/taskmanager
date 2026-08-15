@@ -4,6 +4,7 @@ import com.himanshu.taskmanager.dto.TaskRequest;
 import com.himanshu.taskmanager.dto.TaskResponse;
 import com.himanshu.taskmanager.exception.TaskNotFoundException;
 import com.himanshu.taskmanager.model.Task;
+import com.himanshu.taskmanager.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,10 +13,13 @@ import java.util.List;
 @Service
 public class TaskService {
 
+    private final TaskRepository taskRepository;
+
+    public TaskService(TaskRepository taskRepository){
+        this.taskRepository = taskRepository;
+    }
+
     private final List<Task> taskList = new ArrayList<>();
-
-    private Long nextId = 1L;
-
 
 
     public TaskResponse createTask(TaskRequest taskRequest){
@@ -26,13 +30,15 @@ public class TaskService {
         task.setStatus(taskRequest.getStatus());
         task.setPriority(taskRequest.getPriority());
         task.setDescription(taskRequest.getDescription());
+//
+//        task.setId(nextId);
+//        taskList.add(task);
+//
+//        nextId++;
 
-        task.setId(nextId);
-        taskList.add(task);
+        Task savedTask = taskRepository.save(task);
 
-        nextId++;
-
-        return mapToTaskResponse(task);
+        return mapToTaskResponse(savedTask);
     }
 
     private TaskResponse mapToTaskResponse(Task task) {
