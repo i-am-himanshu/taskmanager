@@ -7,7 +7,6 @@ import com.himanshu.taskmanager.model.Task;
 import com.himanshu.taskmanager.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,9 +18,6 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    private final List<Task> taskList = new ArrayList<>();
-
-
     public TaskResponse createTask(TaskRequest taskRequest){
 
         Task task = new Task();
@@ -30,11 +26,6 @@ public class TaskService {
         task.setStatus(taskRequest.getStatus());
         task.setPriority(taskRequest.getPriority());
         task.setDescription(taskRequest.getDescription());
-//
-//        task.setId(nextId);
-//        taskList.add(task);
-//
-//        nextId++;
 
         Task savedTask = taskRepository.save(task);
 
@@ -55,39 +46,43 @@ public class TaskService {
 
     public List<TaskResponse> getAllTasks() {
 
-        return taskList.stream()
+        return taskRepository.findAll().stream()
                 .map(this::mapToTaskResponse)
                 .toList();
 
     }
 
     public TaskResponse getTask(Long id) {
-        Task foundTask = taskList.stream()
-                .filter(task -> id.equals(task.getId()))
-                .findFirst()
+        Task foundTask = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found."));
 
         return mapToTaskResponse(foundTask);
     }
 
     public void deleteTask(Long id) {
-        boolean isDeleted = taskList.removeIf(task -> id.equals(task.getId()));
+//        boolean isDeleted = taskList.removeIf(task -> id.equals(task.getId()));
+//
+//        if(!isDeleted){
+//            throw new TaskNotFoundException("Task not found.");
+//        }
 
-        if(!isDeleted){
+        if(!taskRepository.existsById(id)) {
             throw new TaskNotFoundException("Task not found.");
         }
+
+        taskRepository.deleteById(id);
     }
 
     public TaskResponse updateTask(Long id, TaskRequest taskRequest) {
-        Task foundTask = taskList.stream()
-                .filter(currentTask -> id.equals(currentTask.getId()))
-                .findFirst()
+        Task foundTask = taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found."));
 
         foundTask.setTitle(taskRequest.getTitle());
         foundTask.setDescription(taskRequest.getDescription());
         foundTask.setStatus(taskRequest.getStatus());
         foundTask.setPriority(taskRequest.getPriority());
+
+        taskRepository.save(foundTask);
 
         return mapToTaskResponse(foundTask);
     }
